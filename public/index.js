@@ -165,12 +165,34 @@ var rentalModifications = [{
   'pickupDate': '2015-12-05'
 }];
 
-function getPriceCarPerDayById(carList, id)
+function getPriceCarPerDayById(carList, id, pickupdate, returnDate)
 {
   for (var i = 0; i < carList.length; i++) {
     if(id == carList[i].id)
     {
-      return carList[i].pricePerDay
+      switch(true)
+      {
+        case(calculateDays(pickupdate, returnDate) == 1):
+          console.log(carList[i].pricePerDay)
+          return carList[i].pricePerDay
+        break;
+        case(calculateDays(pickupdate, returnDate)<= 4):
+          console.log(carList[i].pricePerDay* 0.9)
+          return carList[i].pricePerDay * 0.9
+        break;
+        case(calculateDays(pickupdate, returnDate)<= 10):
+          console.log(carList[i].pricePerDay* 0.7)
+          return carList[i].pricePerDay * 0.7
+        break;
+        case(calculateDays(pickupdate, returnDate)> 10):
+          console.log(carList[i].pricePerDay * 0.5)
+          return carList[i].pricePerDay * 0.5
+        break;
+
+      }
+      //calculateDays(pickupdate, returnDate)
+    //  return carList[i].pricePerDay
+
     }
   }
 }
@@ -220,7 +242,7 @@ function Time(rentalList, carList)
    var time = [];
   for (var i = 0; i < carList.length; i++) {
 
-      time[i] = getPriceCarPerDayById(carList, carList[i].id)  * calculateDays(rentalList[i].pickupDate, rentalList[i].returnDate)
+      time[i] = getPriceCarPerDayById(carList, carList[i].id, rentalList[i].pickupDate, rentalList[i].returnDate)  * calculateDays(rentalList[i].pickupDate, rentalList[i].returnDate)
   }
 
   return time;
@@ -237,19 +259,27 @@ function distance(rentalList, carList)
  return distance;
 }
 
-function RentalPrice(time, distance)
+
+function RentalPrice(rentalList, carList)
 {
+  var distance2 = distance(rentals, cars)
+  var time = Time(rentals, cars)
+
   var rentalPrice = [];
   for (var i = 0; i < time.length; i++) {
-      rentalPrice[i] = time[i] + distance[i]
+      rentalPrice[i] = time[i] + distance2[i]
+      rentalList[i].price = rentalPrice[i]
   }
+
   return rentalPrice
 }
-var distance2 = distance(rentals, cars)
-var time = Time(rentals, cars)
 
-console.log(RentalPrice(distance2, time));
-console.log(cars);
+var rentalPrice = RentalPrice(rentals, cars)
+
+console.log(rentalPrice);
 console.log(rentals);
+/*
+console.log(cars);
 console.log(actors);
 console.log(rentalModifications);
+*/
