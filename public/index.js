@@ -165,6 +165,90 @@ var rentalModifications = [{
   'pickupDate': '2015-12-05'
 }];
 
+function getPriceCarPerDayById(carList, id)
+{
+  for (var i = 0; i < carList.length; i++) {
+    if(id == carList[i].id)
+    {
+      return carList[i].pricePerDay
+    }
+  }
+}
+
+function getCarPriceKmById(carList, id)
+{
+  for (var i = 0; i < carList.length; i++) {
+    if(id == carList[i].id)
+    {
+      return carList[i].pricePerKm
+    }
+  }
+}
+
+function convertVarToDate(date)
+{
+     var d = new Date(date);
+    return d;
+}
+
+function calculateDays(date1Str, date2Str)
+{
+      var date1 = convertVarToDate(date1Str);
+      var date2 = convertVarToDate(date2Str);
+
+      date1 = date1.getTime() / 86400000;
+      date2 = date2.getTime() / 86400000;
+      var result = new Number(date2 - date1).toFixed(0)
+      result = Math.abs(result)
+      result++
+      return result;
+}
+
+function getNbKmbyId(rentalList, id)
+{
+  for (var i = 0; i < rentalList.length; i++) {
+    if(id == rentalList[i].id)
+    {
+      return rentalList[i].distance
+    }
+  }
+}
+
+
+function Time(rentalList, carList)
+ {
+   var time = [];
+  for (var i = 0; i < carList.length; i++) {
+
+      time[i] = getPriceCarPerDayById(carList, carList[i].id)  * calculateDays(rentalList[i].pickupDate, rentalList[i].returnDate)
+  }
+
+  return time;
+}
+
+
+function distance(rentalList, carList)
+{
+  var distance = [];
+ for (var i = 0; i < rentalList.length; i++) {
+     distance[i] = getCarPriceKmById(carList, rentalList[i].carId) * rentalList[i].distance
+     rentalList[i].distance = distance[i]
+ }
+ return distance;
+}
+
+function RentalPrice(time, distance)
+{
+  var rentalPrice = [];
+  for (var i = 0; i < time.length; i++) {
+      rentalPrice[i] = time[i] + distance[i]
+  }
+  return rentalPrice
+}
+var distance2 = distance(rentals, cars)
+var time = Time(rentals, cars)
+
+console.log(RentalPrice(distance2, time));
 console.log(cars);
 console.log(rentals);
 console.log(actors);
