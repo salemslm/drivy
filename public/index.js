@@ -170,29 +170,7 @@ function getPriceCarPerDayById(carList, id, pickupdate, returnDate)
   for (var i = 0; i < carList.length; i++) {
     if(id == carList[i].id)
     {
-      // switch(true)
-      // {
-      //   case(calculateDays(pickupdate, returnDate) == 1):
-      //     console.log(carList[i].pricePerDay)
-      //     return carList[i].pricePerDay
-      //   break;
-      //   case(calculateDays(pickupdate, returnDate)<= 4):
-      //     console.log(carList[i].pricePerDay* 0.9)
-      //     return carList[i].pricePerDay * 0.9
-      //   break;
-      //   case(calculateDays(pickupdate, returnDate)<= 10):
-      //     console.log(carList[i].pricePerDay* 0.7)
-      //     return carList[i].pricePerDay * 0.7
-      //   break;
-      //   case(calculateDays(pickupdate, returnDate)> 10):
-      //     console.log(carList[i].pricePerDay * 0.5)
-      //     return carList[i].pricePerDay * 0.5
-      //   break;
-      //
-      // }
-      //calculateDays(pickupdate, returnDate)
       return carList[i].pricePerDay
-
     }
   }
 }
@@ -260,12 +238,8 @@ function discount(rentalList)
         rentalList[i].price = rentalList[i].price   * 0.5
       break;
       return;
-
     }
-
-
   }
-
 }
 
 function Time(rentalList, carList)
@@ -275,7 +249,6 @@ function Time(rentalList, carList)
 
       time[i] = getPriceCarPerDayById(carList, carList[i].id)  * calculateDays(rentalList[i].pickupDate, rentalList[i].returnDate)
   }
-
   return time;
 }
 
@@ -301,22 +274,50 @@ function RentalPrice(rentalList, carList)
   for (var i = 0; i < time.length; i++) {
       rentalPrice[i] = time[i] + distance2[i]
 
-      // Update price attribute
+      // Update initial price (without discount)
       rentalList[i].price = rentalPrice[i]
-
-
   }
-  //Execute discount
 
+  //Execute discount
   discount(rentalList)
 
+  distributionMoney(rentalList)
   return rentalPrice
 }
 
-var rentalPrice = RentalPrice(rentals, cars)
+function distributionMoney(rentals)
+{
+  var totalMoney
+  var insuranceMoney
+  var roadsideAssistanceMoney
+  var drivyMoney
 
+  for (var i = 0; i < rentals.length; i++)
+  {
+      totalMoney = rentals[i].price
+
+      //Money for insurance
+      insuranceMoney = totalMoney/2
+      totalMoney = totalMoney/2
+
+      //Money for roadsideAssistanceMoney
+      var nbDays = calculateDays(rentals[i].pickupDate, rentals[i].returnDate)
+      roadsideAssistanceMoney = nbDays
+      totalMoney= totalMoney - nbDays
+
+      //Money For Drivy
+      drivyMoney = totalMoney
+
+      rentals[i].commission.insurance = insuranceMoney
+      rentals[i].commission.assistance = roadsideAssistanceMoney
+      rentals[i].commission.drivy = drivyMoney
+
+  }
+}
+var rentalPrice = RentalPrice(rentals, cars)
 console.log(rentalPrice);
 console.log(rentals);
+console.log(rentals[0].commission.insurance)
 /*
 console.log(cars);
 console.log(actors);
