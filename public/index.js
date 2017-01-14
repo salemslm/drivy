@@ -170,28 +170,28 @@ function getPriceCarPerDayById(carList, id, pickupdate, returnDate)
   for (var i = 0; i < carList.length; i++) {
     if(id == carList[i].id)
     {
-      switch(true)
-      {
-        case(calculateDays(pickupdate, returnDate) == 1):
-          console.log(carList[i].pricePerDay)
-          return carList[i].pricePerDay
-        break;
-        case(calculateDays(pickupdate, returnDate)<= 4):
-          console.log(carList[i].pricePerDay* 0.9)
-          return carList[i].pricePerDay * 0.9
-        break;
-        case(calculateDays(pickupdate, returnDate)<= 10):
-          console.log(carList[i].pricePerDay* 0.7)
-          return carList[i].pricePerDay * 0.7
-        break;
-        case(calculateDays(pickupdate, returnDate)> 10):
-          console.log(carList[i].pricePerDay * 0.5)
-          return carList[i].pricePerDay * 0.5
-        break;
-
-      }
+      // switch(true)
+      // {
+      //   case(calculateDays(pickupdate, returnDate) == 1):
+      //     console.log(carList[i].pricePerDay)
+      //     return carList[i].pricePerDay
+      //   break;
+      //   case(calculateDays(pickupdate, returnDate)<= 4):
+      //     console.log(carList[i].pricePerDay* 0.9)
+      //     return carList[i].pricePerDay * 0.9
+      //   break;
+      //   case(calculateDays(pickupdate, returnDate)<= 10):
+      //     console.log(carList[i].pricePerDay* 0.7)
+      //     return carList[i].pricePerDay * 0.7
+      //   break;
+      //   case(calculateDays(pickupdate, returnDate)> 10):
+      //     console.log(carList[i].pricePerDay * 0.5)
+      //     return carList[i].pricePerDay * 0.5
+      //   break;
+      //
+      // }
       //calculateDays(pickupdate, returnDate)
-    //  return carList[i].pricePerDay
+      return carList[i].pricePerDay
 
     }
   }
@@ -235,14 +235,45 @@ function getNbKmbyId(rentalList, id)
     }
   }
 }
+function discount(rentalList)
+{
+  // Execute discount according to days of rent
+  for (var i = 0; i < rentalList.length; i++) {
+    var nbDays = calculateDays(rentalList[i].pickupDate, rentalList[i].returnDate)
 
+    switch(true)
+    {
+      case(nbDays == 1):
+        console.log(rentalList[i].price)
+        rentalList[i].price = rentalList[i].price
+      break;
+      case(nbDays<= 4):
+      console.log(rentalList[i].price* 0.9)
+        rentalList[i].price = rentalList[i].price  * 0.9
+      break;
+      case(nbDays<= 10):
+      console.log(rentalList[i].price* 0.7)
+        rentalList[i].price = rentalList[i].price  * 0.7
+      break;
+      case(nbDays> 10):
+      console.log(rentalList[i].price* 0.5)
+        rentalList[i].price = rentalList[i].price   * 0.5
+      break;
+      return;
+
+    }
+
+
+  }
+
+}
 
 function Time(rentalList, carList)
  {
    var time = [];
   for (var i = 0; i < carList.length; i++) {
 
-      time[i] = getPriceCarPerDayById(carList, carList[i].id, rentalList[i].pickupDate, rentalList[i].returnDate)  * calculateDays(rentalList[i].pickupDate, rentalList[i].returnDate)
+      time[i] = getPriceCarPerDayById(carList, carList[i].id)  * calculateDays(rentalList[i].pickupDate, rentalList[i].returnDate)
   }
 
   return time;
@@ -262,14 +293,22 @@ function distance(rentalList, carList)
 
 function RentalPrice(rentalList, carList)
 {
+
   var distance2 = distance(rentals, cars)
   var time = Time(rentals, cars)
 
   var rentalPrice = [];
   for (var i = 0; i < time.length; i++) {
       rentalPrice[i] = time[i] + distance2[i]
+
+      // Update price attribute
       rentalList[i].price = rentalPrice[i]
+
+
   }
+  //Execute discount
+
+  discount(rentalList)
 
   return rentalPrice
 }
