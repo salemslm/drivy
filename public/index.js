@@ -193,11 +193,14 @@ function convertVarToDate(date)
 
 function calculateDays(date1Str, date2Str)
 {
+      //Converting string to Date type
       var date1 = convertVarToDate(date1Str);
       var date2 = convertVarToDate(date2Str);
 
+      //Get the number of each day
       date1 = date1.getTime() / 86400000;
       date2 = date2.getTime() / 86400000;
+
       var result = new Number(date2 - date1).toFixed(0)
       result = Math.abs(result)
       result++
@@ -262,29 +265,6 @@ function distance(rentalList, carList)
  }
  return distance;
 }
-
-
-function RentalPrice(rentalList, carList)
-{
-
-  var distance2 = distance(rentals, cars)
-  var time = Time(rentals, cars)
-
-  var rentalPrice = [];
-  for (var i = 0; i < time.length; i++) {
-      rentalPrice[i] = time[i] + distance2[i]
-
-      // Update initial price (without discount)
-      rentalList[i].price = rentalPrice[i]
-  }
-
-  //Execute discount
-  discount(rentalList)
-
-  distributionMoney(rentalList)
-  return rentalPrice
-}
-
 function distributionMoney(rentals)
 {
   var totalMoney
@@ -314,10 +294,48 @@ function distributionMoney(rentals)
 
   }
 }
+
+
+function deductible(rentals)
+{
+  for (var i = 0; i < rentals.length; i++) {
+    var nbDays = calculateDays(rentals[i].pickupDate, rentals[i].returnDate)
+    if(rentals[i].options.deductibleReduction == true)
+    {
+      rentals[i].price = rentals[i].price + (4*nbDays)
+    }
+  }
+}
+
+function RentalPrice(rentalList, carList)
+{
+
+  var distance2 = distance(rentals, cars)
+  var time = Time(rentals, cars)
+
+  var rentalPrice = [];
+  for (var i = 0; i < time.length; i++) {
+      rentalPrice[i] = time[i] + distance2[i]
+
+      // Update initial price (without discount)
+      rentalList[i].price = rentalPrice[i]
+  }
+
+  //Execute discount
+  discount(rentalList)
+
+  //Distribution of moneys for insurance, Drivy ...
+  distributionMoney(rentalList)
+
+  //Apply deductible amount (Franchise)
+  deductible(rentalList)
+  return rentalPrice
+}
+
+
 var rentalPrice = RentalPrice(rentals, cars)
 console.log(rentalPrice);
 console.log(rentals);
-console.log(rentals[0].commission.insurance)
 /*
 console.log(cars);
 console.log(actors);
