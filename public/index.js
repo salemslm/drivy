@@ -165,6 +165,35 @@ var rentalModifications = [{
   'pickupDate': '2015-12-05'
 }];
 
+
+function getRentalById(rentals, id)
+{
+  for (var i = 0; i < rentals.length; i++) {
+    if (id == rentals[i].id) {
+        return rentals[i];
+    }
+  }
+}
+
+function getActorByIdRental(actors, idRental)
+{
+  for (var i = 0; i < actors.length; i++) {
+    if (idRental == actors[i].rentalId) {
+        return actors[i];
+    }
+  }
+}
+
+function getCarById(cars, id)
+{
+  for (var i = 0; i < cars.length; i++) {
+    if (id == cars[i].id) {
+        return cars[i];
+    }
+  }
+}
+
+
 function getPriceCarPerDayById(carList, id, pickupdate, returnDate)
 {
   for (var i = 0; i < carList.length; i++) {
@@ -220,25 +249,26 @@ function discount(rentalList)
 {
   // Execute discount according to days of rent
   for (var i = 0; i < rentalList.length; i++) {
-    var nbDays = calculateDays(rentalList[i].pickupDate, rentalList[i].returnDate)
+    var currentRental = getRentalById(rentalList, rentalList[i].id)
+    var nbDays = calculateDays(currentRental.pickupDate, currentRental.returnDate)
 
     switch(true)
     {
       case(nbDays == 1):
-        console.log(rentalList[i].price)
-        rentalList[i].price = rentalList[i].price
+        console.log(currentRental.price)
+        currentRental.price = currentRental.price
       break;
       case(nbDays<= 4):
-      console.log(rentalList[i].price* 0.9)
-        rentalList[i].price = rentalList[i].price  * 0.9
+      console.log(currentRental.price* 0.9)
+        currentRental.price = currentRental.price  * 0.9
       break;
       case(nbDays<= 10):
-      console.log(rentalList[i].price* 0.7)
-        rentalList[i].price = rentalList[i].price  * 0.7
+      console.log(currentRental.price* 0.7)
+        currentRental.price = currentRental.price  * 0.7
       break;
       case(nbDays> 10):
-      console.log(rentalList[i].price* 0.5)
-        rentalList[i].price = rentalList[i].price   * 0.5
+      console.log(currentRental.price* 0.5)
+        currentRental.price = currentRental.price   * 0.5
       break;
       return;
     }
@@ -250,7 +280,7 @@ function Time(rentalList, carList)
    var time = [];
   for (var i = 0; i < carList.length; i++) {
 
-      time[i] = getPriceCarPerDayById(carList, carList[i].id)  * calculateDays(rentalList[i].pickupDate, rentalList[i].returnDate)
+      time[i] = getCarById(carList, carList[i].id).pricePerDay  * calculateDays(rentalList[i].pickupDate, rentalList[i].returnDate)
   }
   return time;
 }
@@ -260,7 +290,7 @@ function distance(rentalList, carList)
 {
   var distance = [];
  for (var i = 0; i < rentalList.length; i++) {
-     distance[i] = getCarPriceKmById(carList, rentalList[i].carId) * rentalList[i].distance
+     distance[i] = getCarById(carList, rentalList[i].carId).pricePerKm * rentalList[i].distance
      rentalList[i].distance = distance[i]
  }
  return distance;
@@ -274,7 +304,7 @@ function distributionMoney(rentals)
 
   for (var i = 0; i < rentals.length; i++)
   {
-      totalMoney = rentals[i].price
+      totalMoney = rentals[i].price* 0.3
 
       //Money for insurance
       insuranceMoney = totalMoney/2
@@ -333,9 +363,48 @@ function RentalPrice(rentalList, carList)
 }
 
 
+function PayTheActors(rentals, actors)
+{
+  for (var i = 0; i < actors.length; i++) {
+    var currentRental = getRentalById(rentals, actors[i].rentalId)
+    var currentActor = getActorByIdRental(actors, actors[i].rentalId)
+    var commission = currentRental.commission.insurance + currentRental.commission.assistance + currentRental.commission.drivy
+
+    //For the next lines, here is a help :
+    // currentActor.payment[0] is the driver
+    // currentActor.payment[1] is the owner
+    // currentActor.payment[2] is the insurance
+    // currentActor.payment[3] is the assistance
+    // currentActor.payment[4] is Drivy
+
+     //the driver must pay the rental price and the (optional) deductible reduction
+     currentActor.payment[0].amount = currentRental.price
+
+     //the owner receives the rental price minus the commission
+     currentActor.payment[1].amount = currentRental.price - commission
+
+     //the insurance receives its part of the commission
+     currentActor.payment[2].amount = currentRental.commission.insurance
+
+     //the assistance receives its part of the commission
+     currentActor.payment[3].amount = currentRental.commission.assistance
+
+     //drivy receives its part of the commission, plus the deductible reduction
+     currentActor.payment[4].amount = currentRental.commission.drivy
+
+  }
+  console.log(currentRental.commission.insurance)
+  return;
+
+}
+
+
 var rentalPrice = RentalPrice(rentals, cars)
+PayTheActors(rentals, actors)
 console.log(rentalPrice);
-console.log(rentals);
+//console.log(getRentalById(rentals, '1-pb-92').price)
+
+//console.log(actors[0].payment[0].amount);
 /*
 console.log(cars);
 console.log(actors);
